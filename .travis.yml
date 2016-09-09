@@ -1,0 +1,18 @@
+language: python
+python:
+- '2.7'
+- '3.3'
+- '3.4'
+- '3.5'
+install:
+- pip install -r requirements.txt
+- pip install coveralls
+script: coverage run --source=usfm_utils setup.py test
+after_success: coveralls
+deploy:
+  provider: pypi
+  user: ethantkoenig
+  password:
+    secure: J2nGLwcta4c2YXeYHxe2HJc/2IzhQxBUBwOg7ymZMKsavuVmXWH0gUGDlrj8nfUt1tlp7iuNO1P7PYvqK+5IUBjMdgaEchzkjFplr44SGIW2WrMK81ZUKWVh2t4wR4Ep6KigSQArGy0RXevLiYeg4p+JMxV25ZeZRwzcEauVzKx5jc4rpDF6NN2tkp5cL7dpRosfr5Dj9jTGJ9xX8uLZc3IdAW2vT/UgqumvdMMqmxijMWSHphWxV2m2TgM5qktsp0YileR4dxrR+hG77fW+S5ehvFgJr+/heiXe1I5buEJXE05voPMYoMrNiJcJiieadqIzel53U6JKgLOABMB+9pgNrfopHbiA1d2ptJVp4keW0C/qY0h7Uhtu+5DfvanmlnO2Gq8ECwGA7sXzDL6CMrbUAELfLQ+cxc/nzWOXIggw6AKVFkHxLb+OjRLokvgaizMauNuktG3QnQ8Yko2QoGUt7vKSSfUrn1H3opFzDhRVCm+jtgYCR6FQ2PZXS1Djw5x3z5ncuEDFRpZvW1zrQSTPqof7n5FfSMnKr6a+AudNJn24XiCJst4BI46LAHetos+f5XploGtlMgZt1jXWhQz0k4Ck78zLhmihrrlnFxgsPrwE/qW7nLy2gwRs39pzqNg3Zc5COIL9d4uG4pmnWkuZwswryhkZMCqaWxbQP1g=
+  on:
+    tags: true

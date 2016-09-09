@@ -1,0 +1,2 @@
+[run]
+omit = usfm_utils/usfm/parsetab.py
