@@ -27,6 +27,6 @@ setup(
     ],
     keywords=["usfm", "html"],
     packages=find_packages(),
-    install_requires=["future"],
+    install_requires=["enum34", "future", "ply"],
     test_suite="tests"
 )
