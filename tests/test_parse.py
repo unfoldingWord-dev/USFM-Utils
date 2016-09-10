@@ -192,23 +192,24 @@ class UsfmParserTests(unittest.TestCase):
 
     def test_footnotes(self):
         for name, (flag, kind) in footnotes.items():
-            word = test_utils.word()
-            paragraph_flag = random.choice(["p", "m", "pi", "ipr"])
-            lines = (
-                r"\{}".format(paragraph_flag),
-                r"\{f} + {w} \{f}*".format(f=flag, w=word)
-            )
-            document = self.parse(*lines)
-            self.assertIsNone(document.heading)
-            elements = document.elements
-            self.assertEqual(len(elements), 1)
-            paragraph = elements[0]
-            self.assertIsInstance(paragraph, Paragraph)
-            children = paragraph.children
-            self.assertEqual(len(children), 1)
-            footnote = children[0]
-            self.assertIsInstance(footnote, Footnote)
-            self.assertEqual(footnote.kind, kind)
+            for label in ("+", "-", "4"):
+                word = test_utils.word()
+                paragraph_flag = random.choice(["p", "m", "pi", "ipr"])
+                lines = (
+                    r"\{}".format(paragraph_flag),
+                    r"\{f} {l} {w} \{f}*".format(f=flag, l=label, w=word)
+                )
+                document = self.parse(*lines)
+                self.assertIsNone(document.heading)
+                elements = document.elements
+                self.assertEqual(len(elements), 1)
+                paragraph = elements[0]
+                self.assertIsInstance(paragraph, Paragraph)
+                children = paragraph.children
+                self.assertEqual(len(children), 1)
+                footnote = children[0]
+                self.assertIsInstance(footnote, Footnote)
+                self.assertEqual(footnote.kind, kind)
 
 
 if __name__ == "__main__":
