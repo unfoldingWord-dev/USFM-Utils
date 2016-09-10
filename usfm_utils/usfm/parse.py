@@ -274,8 +274,7 @@ class UsfmParser(object):
         t[0] = Footnote(Footnote.Kind.cross_reference, t[3], t[2].value)
 
     def p_error(self, token):
-        msg = "Unexpected token: {} of type {} at {}".format(
-            unescape_text(repr(token.value.value[:100])),
+        msg = "Unexpected token of type {} at {}".format(
             token.type,
             token.value.position)
         raise ValueError(msg)

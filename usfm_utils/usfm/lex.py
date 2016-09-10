@@ -161,13 +161,14 @@ class UsfmLexer(object):
     t_text.__doc__ = r"[^\{prefix}]+".format(prefix=FLAG_PREFIX)
 
     def t_error(self, token):
-        text_to_display = repr(unescape_text(token.value[:50]))
-        raise ValueError("Bad token: {} at {}".format(text_to_display, str(self.pos.position)))
+        text = token.value
+        newline_index = text.find("\n")
+        max_index = 80 if newline_index < -1 or newline_index > 80 else newline_index
+        text_to_display = "\"{}\"".format(unescape_text(token.value[:max_index]))
+        raise ValueError("Unrecognized token: {} at {}".format(text_to_display, str(self.pos.position)))
 
     def t_footnotelabel_error(self, token):
-        line = self.pos.position.line
-        col = self.pos.position.col
-        position = "line: {}, col: {}".format(line, col)
+        position = str(self.pos.position)
         raise ValueError("Expected a footnote label at " + position)
 
     def t_whitespace(self, t):
