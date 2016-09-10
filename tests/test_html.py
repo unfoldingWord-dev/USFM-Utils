@@ -4,7 +4,7 @@ import unittest
 from usfm_utils.elements.document import Document
 from usfm_utils.elements.element_impls import FormattedText, Text, Paragraph, Footnote
 from usfm_utils.elements.footnote_utils import AutomaticFootnoteLabel
-from usfm_utils.render_html.html_visitor import HtmlVisitor, non_span_formatting
+from usfm_utils.html.html_visitor import HtmlVisitor, non_span_formatting
 
 from tests import test_utils
 

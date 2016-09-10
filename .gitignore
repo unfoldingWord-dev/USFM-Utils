@@ -91,3 +91,7 @@ ENV/
 
 # IDE files
 .idea/
+
+# 
+*parser.out
+*parsetab.py

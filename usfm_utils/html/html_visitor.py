@@ -1,8 +1,10 @@
 from usfm_utils.elements.document import Document
-from usfm_utils.elements.element_impls import FormattedText, ChapterNumber, Whitespace
+from usfm_utils.elements.element_impls import FormattedText, ChapterNumber, \
+    Whitespace
 from usfm_utils.elements.element_visitor import ElementVisitor
 from usfm_utils.elements.paragraph_utils import ParagraphLayoutVisitor
-from usfm_utils.render_html.html_utils import open_tag, close_tag, open_span, close_span, add_class
+from usfm_utils.html.html_utils import open_tag, close_tag, open_span, \
+    close_span, add_class
 
 
 class HtmlVisitor(ElementVisitor):
@@ -173,16 +175,16 @@ non_span_formatting = {
 
 
 def html_header(title=""):
-    return u"""<!DOCTYPE render_html>
+    return u"""<!DOCTYPE html>
         <meta charset=\"utf-8\">
         <head>
         <title>{title}</title>
         <link rel=\"stylesheet\" href=\"default.css\">
         </head>
-        <render_html>
+        <html>
         <body>
         """.format(title=title)
 
 
 def html_footer():
-    return """</body></render_html>"""
+    return """</body></html>"""
