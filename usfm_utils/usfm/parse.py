@@ -228,7 +228,8 @@ class UsfmParser(object):
 
     def p_toc(self, t):
         """higher_element : TABLE_OF_CONTENTS"""
-        weight, value = t[1].value
+        value = t[1].value
+        weight = t[1].number
         if weight == 1:
             self._toc_builder.set_long_description(value)
         elif weight == 2:

@@ -5,11 +5,13 @@ import unittest
 
 from usfm_utils.elements.abstract_elements import Element
 from usfm_utils.elements.document import Document
-from usfm_utils.elements.element_impls import ChapterNumber, Paragraph, FormattedText, Text, Heading, Whitespace, Footnote
+from usfm_utils.elements.element_impls import ChapterNumber, Paragraph, \
+    FormattedText, Text, Heading, Whitespace, Footnote
 from usfm_utils.elements.paragraph_utils import LeftAligned
 from tests import test_utils
-from usfm_utils.usfm.flags import paragraphs, indented_paragraphs, lower_open_closes, higher_open_closes, headings, \
-    higher_rest_of_lines, lower_until_next_flags, whitespace, footnotes
+from usfm_utils.usfm.flags import paragraphs, indented_paragraphs, \
+    lower_open_closes, higher_open_closes, headings, higher_rest_of_lines, \
+    lower_until_next_flags, whitespace, footnotes
 from usfm_utils.usfm.lex import UsfmLexer
 from usfm_utils.usfm.parse import UsfmParser
 
@@ -189,6 +191,21 @@ class UsfmParserTests(unittest.TestCase):
         elements = document.elements
         self.assertEqual(len(elements), 1)
 
+    def test_table_of_contents(self):
+        word1 = test_utils.word()
+        word2 = test_utils.word()
+        word3 = test_utils.word()
+        document = self.parse(
+            r"\toc1 {}".format(word1),
+            r"\toc2 {}".format(word2),
+            r"\toc3 {}".format(word3)
+        )
+        elements = document.elements
+        self.assertEqual(len(elements), 0)
+        toc = document.table_of_contents
+        self.assertEqual(toc.long_description, word1)
+        self.assertEqual(toc.short_description, word2)
+        self.assertEqual(toc.abbreviation, word3)
 
     def test_footnotes(self):
         for name, (flag, kind) in footnotes.items():
