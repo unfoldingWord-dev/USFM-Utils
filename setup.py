@@ -10,7 +10,7 @@ with open(path.join(here, "README.rst"), "r") as f:
 
 setup(
     name="usfm_utils",
-    version="1.0.3",
+    version="1.0.4",
     description="Utilities for handling USFM files, from parsing to converting.",
     long_description=long_description,
     url="https://github.com/unfoldingWord-dev/USFM-Utils",
