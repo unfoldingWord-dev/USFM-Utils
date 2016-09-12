@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+
+from usfm_utils.elements.footnote_utils import FootnoteLabelVisitor
+
 from usfm_utils.elements.document import Document
 from usfm_utils.elements.element_impls import FormattedText, ChapterNumber, \
     Whitespace
@@ -80,7 +84,11 @@ class HtmlVisitor(ElementVisitor):
     def before_footnote(self, footnote):
         footnote_id = self._next_footnote_id
         self._next_footnote_id = footnote_id + 1
-        self.record("<sup><a href=\"#fn{id}\" id=\"ref{id}\">{id}</a></sup>".format(id=footnote_id))
+
+        visitor = HtmlVisitor.HtmlFootnoteLabelVisitor(str(footnote_id))
+        footnote.label.accept(visitor)
+        self.record("<sup><a href=\"#fn{id}\" id=\"ref{id}\">{lbl}</a></sup>"
+                    .format(id=footnote_id, lbl=visitor.result))
         entry = HtmlVisitor.Entry(footnote_id, footnote.kind)
         self._accumulated_footnotes.append(entry)
         self._current_footnotes.append(entry)
@@ -147,6 +155,24 @@ class HtmlVisitor(ElementVisitor):
 
         def write(self, s):
             self._content += s
+
+    class HtmlFootnoteLabelVisitor(FootnoteLabelVisitor):
+        def __init__(self, default):
+            self._default = default
+            self._result = None
+
+        @property
+        def result(self):
+            return self._result
+
+        def automatic(self, auto):
+            self._result = self._default
+
+        def no_label(self, no_label):
+            self._result = ""
+
+        def custom(self, custom):
+            self._result = custom.content
 
     class HtmlParagraphLayoutVisitor(ParagraphLayoutVisitor):
         def __init__(self):

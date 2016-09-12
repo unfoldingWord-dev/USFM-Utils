@@ -3,7 +3,7 @@ import unittest
 
 from usfm_utils.elements.document import Document
 from usfm_utils.elements.element_impls import FormattedText, Text, Paragraph, Footnote
-from usfm_utils.elements.footnote_utils import AutomaticFootnoteLabel
+from usfm_utils.elements.footnote_utils import AutomaticFootnoteLabel, CustomFootnoteLabel
 from usfm_utils.html.html_visitor import HtmlVisitor, non_span_formatting
 
 from tests import test_utils
@@ -30,6 +30,15 @@ class HtmlRenderingTest(unittest.TestCase):
             rendered = self.render_elements(paragraph)
             self.assertIn(kind.name, rendered)
             self.assertIn(word, rendered)
+        for kind in list(Footnote.Kind):
+            word = test_utils.word()
+            label = test_utils.word(allow_empty=False)
+            footnote = Footnote(kind, [Text(word)], CustomFootnoteLabel(label))
+            paragraph = Paragraph([footnote])
+            rendered = self.render_elements(paragraph)
+            self.assertIn(kind.name, rendered)
+            self.assertIn(word, rendered)
+            self.assertIn(label, rendered)
 
     def test_formatted_text(self):
         for kind in list(FormattedText.Kind):
