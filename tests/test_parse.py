@@ -14,6 +14,7 @@ from usfm_utils.usfm.flags import paragraphs, indented_paragraphs, \
     lower_until_next_flags, whitespace, footnotes
 from usfm_utils.usfm.lex import UsfmLexer
 from usfm_utils.usfm.parse import UsfmParser
+from usfm_utils.usfm.usfm_error import UsfmInputError
 
 
 class UsfmParserTests(unittest.TestCase):
@@ -227,6 +228,55 @@ class UsfmParserTests(unittest.TestCase):
                 footnote = children[0]
                 self.assertIsInstance(footnote, Footnote)
                 self.assertEqual(footnote.kind, kind)
+
+    # tests for errors
+
+    def test_unrecognized_flag(self):
+        for _ in range(10):
+            word = test_utils.word()
+            lines = (
+                r"\{}".format(random.choice(["p", "m", "pi", "ipr"])),
+                r"\{flag}".format(flag=word),
+            )
+            self.assert_raises_at(lines, line_no=2, col=1)
+
+    def test_no_footnote_label(self):
+        for name, (flag, kind) in footnotes.items():
+            lines = (
+                r"\mt1 {}".format(test_utils.word()),
+                r"\{f} \{f}*".format(f=flag),
+            )
+            self.assert_raises_at(lines, line_no=2, col=len(flag) + 3)
+
+    def test_unmatched(self):
+        for name, (flag, kind) in lower_open_closes.items():
+            if kind is None:
+                continue
+            lines = (
+                r"\{}".format(random.choice(["p", "m", "pi", "ipr"])),
+                r"\{f} {w}".format(f=flag, w=test_utils.word()),
+                r"   "
+            )
+            self.assert_raises_at(lines, line_no=4, col=1)
+            word = test_utils.word()
+            lines = (
+                r"\{}".format(random.choice(["p", "m", "pi", "ipr"])),
+                r"{w} \{f}*".format(w=word, f=flag),
+                r"  "
+            )
+            self.assert_raises_at(lines, line_no=2, col=len(word) + 2)
+
+    # helper function
+
+    def assert_raises_at(self, lines, line_no, col=None):
+        try:
+            self.parse(*lines)
+            self.fail()
+        except UsfmInputError as e:
+            self.assertIsNotNone(e.message)
+            self.assertEqual(e.position.line, line_no)
+            if col is not None:
+                self.assertEqual(e.position.col, col)
 
 
 if __name__ == "__main__":

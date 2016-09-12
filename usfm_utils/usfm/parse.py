@@ -3,11 +3,11 @@ import ply.yacc as yacc
 from usfm_utils.elements.document import Document, TableOfContentsInfo
 from usfm_utils.elements.element_impls import Footnote, FormattedText, \
     Paragraph, Text, ChapterNumber
-from usfm_utils.usfm.escape_text import unescape_text
-from usfm_utils.usfm.lex import tokens
 from usfm_utils.usfm.flags import paragraphs, indented_paragraphs, \
     lower_open_closes, higher_open_closes, headings, higher_rest_of_lines, \
     lower_until_next_flags, whitespace
+from usfm_utils.usfm.lex import tokens
+from usfm_utils.usfm.usfm_error import UsfmInputError
 
 
 def parse_paragraph(name, builder):
@@ -124,7 +124,7 @@ class UsfmParser(object):
         setattr(UsfmParser, "p_" + name, func)
 
     def p_document(self, t):
-        """document : higher_elements"""
+        """document : higher_elements EOF"""
         t[0] = Document(t[1],
                         heading=self._heading,
                         table_of_contents=self._toc_builder.build())
@@ -275,10 +275,8 @@ class UsfmParser(object):
         t[0] = Footnote(Footnote.Kind.cross_reference, t[3], t[2].value)
 
     def p_error(self, token):
-        msg = "Unexpected token of type {} at {}".format(
-            token.type,
-            token.value.position)
-        raise ValueError(msg)
+        msg = "Unexpected token of type {}".format(token.type)
+        raise UsfmInputError(msg, token.value.position)
 
     def parse(self, lexer):
         return self._parser.parse(lexer=lexer)

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import itertools
 
 import ply.lex as lex
@@ -13,7 +15,7 @@ from usfm_utils.usfm.lex_utils import standalone, open_token, close_token, one_a
     until_next_flag, rest_of_line, open_token_regex, FLAG_PREFIX, scale, \
     scale_and_rest_of_line
 from usfm_utils.usfm.tokens import Position, Token
-
+from usfm_utils.usfm.usfm_error import UsfmInputError
 
 # TODO
 # unimplemented USFM tags:
@@ -54,10 +56,12 @@ class UsfmLexer(object):
     states = (("footnotelabel", "exclusive"),)
 
     def __init__(self):
-        self.token_list = []
+        self.token_list = ["EOF"]
         self.tokens = None
         self.pos = UpdateablePosition()
         self.lexer = None
+
+        self.reached_eof = False
 
     @staticmethod
     def create():
@@ -72,9 +76,9 @@ class UsfmLexer(object):
     def register(self, name, func, state=None, discard=False):
         """
         "Registers" a lexical rule so that PLY will recognize it
-        :param str name: name of token
+        :param str|unicode name: name of token
         :param callable func: lexical rule to register
-        :param str state: lexer state to which the rule applies
+        :param str|unicode state: lexer state to which the rule applies
         :param bool discard: if token should be discarded
         """
         def register_helper(this, token):  # this to avoid collision with self
@@ -82,7 +86,7 @@ class UsfmLexer(object):
             if func(token) is None:
                 this.pos.update(s)
                 return
-            token.value = token.value.build(Position(this.pos.position.line, this.pos.position.col))
+            token.value = token.value.build(this.pos.position)
             this.pos.update(s)
             if not discard:
                 return token
@@ -164,12 +168,12 @@ class UsfmLexer(object):
         text = token.value
         newline_index = text.find("\n")
         max_index = 80 if newline_index < -1 or newline_index > 80 else newline_index
-        text_to_display = "\"{}\"".format(unescape_text(token.value[:max_index]))
-        raise ValueError("Unrecognized token: {} at {}".format(text_to_display, str(self.pos.position)))
+        text_to_display = "\"{}\"".format(unescape_text(text[:max_index]))
+        raise UsfmInputError("Unrecognized token: {}".format(text_to_display),
+                             self.pos.position)
 
     def t_footnotelabel_error(self, token):
-        position = str(self.pos.position)
-        raise ValueError("Expected a footnote label at " + position)
+        raise UsfmInputError("Expected a footnote label", self.pos.position)
 
     def t_whitespace(self, t):
         r"""[ \t\r\n]+"""
@@ -177,9 +181,20 @@ class UsfmLexer(object):
 
     t_footnotelabel_whitespace = t_whitespace
 
+    def t_eof(self, token):
+        if not self.reached_eof:
+            token.value = Token(self.pos.position, None)
+            token.type = "EOF"
+            self.reached_eof = True
+            return token
+
     def input(self, s):
+        self.lexer.begin("INITIAL")
+        self.reached_eof = False
         self.pos = UpdateablePosition()
-        s = escape_text(s) + "\n"
+        s = escape_text(s)
+        if s[-1] != "\n":
+            s += "\n"
         self.lexer.input(s)
 
     def token(self):
