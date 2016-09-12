@@ -28,6 +28,7 @@ paragraphs = {
                                                   embedded=True)),
     "EMBEDDED_REFRAIN": ("pmr", Paragraph.Builder(embedded=True,
                                                   layout=RightAligned())),
+    "NO_BREAK": ("nb", None),
     "POETIC_RIGHT_ALIGNED": ("qr", Paragraph.Builder(layout=RightAligned(),
                                                      poetic=True)),
     "POETIC_CENTERED": ("qc", Paragraph.Builder(layout=Centered(), poetic=True)),

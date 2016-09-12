@@ -11,7 +11,7 @@ from usfm_utils.elements.paragraph_utils import LeftAligned
 class Text(Element):
     def __init__(self, content):
         """
-        :param str content:
+        :param str|unicode content:
         """
         self._content = content
 
@@ -149,13 +149,14 @@ class OtherText(KindedElement, ParentElement):
 class Paragraph(MaybeIntroductoryElement, ParentElement):
 
     def __init__(self, children, layout=None, embedded=False,
-                 introductory=False, poetic=False):
+                 introductory=False, poetic=False, continuation=False):
         """
         :param iterable<SmallElement> children:
         :param ParagraphLayout layout:
         :param bool embedded:
         :param bool introductory:
         :param bool poetic:
+        :param bool continuation:
         """
         ParentElement.__init__(self, children)
         self._children = tuple(children)
@@ -166,6 +167,7 @@ class Paragraph(MaybeIntroductoryElement, ParentElement):
         self._embedded = embedded
         MaybeIntroductoryElement.__init__(self, introductory)
         self._poetic = poetic
+        self._continuation = continuation
 
     @property
     def layout(self):
@@ -185,18 +187,23 @@ class Paragraph(MaybeIntroductoryElement, ParentElement):
     def poetic(self):
         return self._poetic
 
+    @property
+    def continuation(self):
+        return self._continuation
+
     def accept(self, visitor):
         visitor.before_paragraph(self)
         self.visit_children(visitor)
         visitor.after_paragraph(self)
 
     class Builder(object):
-        def __init__(self, layout=None, embedded=False,
-                     introductory=False, poetic=False):
+        def __init__(self, layout=None, embedded=False, introductory=False,
+                     poetic=False, continuation=False):
             self._layout = layout
             self._embedded = embedded
             self._introductory = introductory
             self._poetic = poetic
+            self._continuation = continuation
 
         def __call__(self, children):
             return self.build(children)
@@ -205,13 +212,13 @@ class Paragraph(MaybeIntroductoryElement, ParentElement):
             self._layout = layout
             return self
 
-
         def build(self, children):
             return Paragraph(children,
                              layout=self._layout,
                              embedded=self._embedded,
                              introductory=self._introductory,
-                             poetic=self._poetic)
+                             poetic=self._poetic,
+                             continuation=self._continuation)
 
 
 class Reference(KindedElement, ParentElement):

@@ -19,7 +19,6 @@ from usfm_utils.usfm.usfm_error import UsfmInputError
 
 # TODO
 # unimplemented USFM tags:
-# - nb
 # - tables
 # - images
 

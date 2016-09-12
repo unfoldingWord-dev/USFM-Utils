@@ -53,13 +53,15 @@ class HtmlRenderingTest(unittest.TestCase):
 
     def test_paragraph(self):
         bools = (False, True)
-        for embedded, poetic, introductory in itertools.product(bools, bools, bools):
+        for embedded, poetic, introductory, continuation \
+                in itertools.product(bools, bools, bools, bools):
             word = test_utils.word()
             text = Text(word)
             paragraph = Paragraph([text],
                                   embedded=embedded,
                                   poetic=poetic,
-                                  introductory=introductory)
+                                  introductory=introductory,
+                                  continuation=continuation)
             rendered = self.render_elements(paragraph)
             self.assertIn(word, rendered)
             if embedded:
@@ -74,6 +76,11 @@ class HtmlRenderingTest(unittest.TestCase):
                 self.assertIn("introductory", rendered)
             else:
                 self.assertNotIn("introductory", rendered)
+            if continuation:
+                self.assertIn("continuation", rendered)
+            else:
+                self.assertNotIn("continuation", rendered)
+
 
     class TestFile(object):
         """

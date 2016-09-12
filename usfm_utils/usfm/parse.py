@@ -1,4 +1,5 @@
 import ply.yacc as yacc
+from usfm_utils.elements.paragraph_utils import LeftAligned
 
 from usfm_utils.elements.document import Document, TableOfContentsInfo
 from usfm_utils.elements.element_impls import Footnote, FormattedText, \
@@ -12,7 +13,9 @@ from usfm_utils.usfm.usfm_error import UsfmInputError
 
 def parse_paragraph(name, builder):
     def parse_paragraph_inner(self, t):
-        t[0] = [builder(t[2])]
+        paragraph = builder(t[2])
+        self._previous_paragraph = paragraph
+        t[0] = [paragraph]
     parse_paragraph_inner.__doc__ = "higher_element : {} lower_elements".format(name)
     return parse_paragraph_inner
 
@@ -21,7 +24,9 @@ def parse_indented_paragraph(name, constructor):
     def parse_indented_paragraph_inner(self, t):
         indent = t[1].number
         children = t[2]
-        t[0] = [constructor(children, indent)]
+        paragraph = constructor(children, indent)
+        self._previous_paragraph = paragraph
+        t[0] = [paragraph]
     parse_indented_paragraph_inner.__doc__ = "higher_element : {} lower_elements".format(name)
     return parse_indented_paragraph_inner
 
@@ -102,6 +107,9 @@ class UsfmParser(object):
         self._formattings = []
         self._parser = None
 
+        # previous paragraph
+        self._previous_paragraph = None
+
         # metadata
         self._heading = None
         self._toc_builder = TableOfContentsInfo.Builder()
@@ -143,6 +151,8 @@ class UsfmParser(object):
         self.tokens = tokens
 
         for (name, (flag, builder)) in paragraphs.items():
+            if builder is None:
+                continue
             self.register(name, parse_paragraph(name, builder))
 
         for (name, (flag, constructor)) in indented_paragraphs.items():
@@ -225,6 +235,23 @@ class UsfmParser(object):
         heading = t[1].value
         self._heading = heading
         t[0] = []
+
+    def p_no_break(self, t):
+        """higher_element : NO_BREAK lower_elements"""
+        prev = self._previous_paragraph
+        if prev is None:
+            paragraph = Paragraph(t[2])
+        else:
+            paragraph = Paragraph(
+                t[2],
+                layout=LeftAligned(LeftAligned.FirstLineIndent.none),
+                embedded=prev.embedded,
+                introductory=prev.introductory,
+                poetic=prev.poetic,
+                continuation=True
+            )
+        self._previous_paragraph = paragraph
+        t[0] = [paragraph]
 
     def p_toc(self, t):
         """higher_element : TABLE_OF_CONTENTS"""

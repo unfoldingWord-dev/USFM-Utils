@@ -57,6 +57,8 @@ class HtmlVisitor(ElementVisitor):
             add_class(attributes, "introductory")
         if paragraph.poetic:
             add_class(attributes, "poetic")
+        if paragraph.continuation:
+            add_class(attributes, "continuation")
         self.record(open_tag("p", **attributes))
 
     def after_paragraph(self, paragraph):

@@ -229,6 +229,32 @@ class UsfmParserTests(unittest.TestCase):
                 self.assertIsInstance(footnote, Footnote)
                 self.assertEqual(footnote.kind, kind)
 
+    def test_no_break(self):
+        for _ in range(10):
+            paragraph_flag = random.choice(["p", "m", "pmo", "pi", "q"])
+            text = " ".join(test_utils.word() for _ in range(10)) + "a"
+            lines = (
+                r"\{p}".format(p=paragraph_flag),
+                r"\nb",
+                r"{t}".format(t=text)
+            )
+            document = self.parse(*lines)
+            elements = document.elements
+            self.assertEqual(len(elements), 2)
+            p0 = elements[0]
+            self.assertIsInstance(p0, Paragraph)
+            p1 = elements[1]
+            self.assertIsInstance(p1, Paragraph)
+            self.assertEqual(p0.embedded, p1.embedded)
+            self.assertEqual(p0.poetic, p1.poetic)
+            self.assertEqual(p0.introductory, p1.introductory)
+            self.assertFalse(p0.continuation)
+            self.assertTrue(p1.continuation)
+            self.assertEqual(len(p1.children), 1)
+            child = p1.children[0]
+            self.assertIsInstance(child, Text)
+            self.assertEqual(child.content.strip(), text.strip())
+
     # tests for errors
 
     def test_unrecognized_flag(self):
