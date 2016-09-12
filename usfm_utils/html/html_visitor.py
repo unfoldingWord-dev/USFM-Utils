@@ -8,11 +8,13 @@ from usfm_utils.html.html_utils import open_tag, close_tag, open_span, \
 
 
 class HtmlVisitor(ElementVisitor):
-    def __init__(self, writable_file):
+    def __init__(self, writable_file, stylesheets=()):
         """
         :param file writable_file: file to write to
+        :param iterable[str|unicode] stylesheets: filenames for stylesheets
         """
         self._file = writable_file
+        self._stylesheets = stylesheets
 
         # footnotes
         self._next_footnote_id = 1
@@ -27,7 +29,8 @@ class HtmlVisitor(ElementVisitor):
         :param Document document:
         :return:
         """
-        self._file.write(html_header(title=document.heading))
+        self._file.write(html_header(title=document.heading,
+                                     stylesheets=self._stylesheets))
         for element in document.elements:
             element.accept(self)
         self.write_footnotes()
@@ -174,16 +177,18 @@ non_span_formatting = {
 }
 
 
-def html_header(title=""):
+def html_header(title="", stylesheets=()):
+    styles = "\n".join("<link rel=\"stylesheet\" href=\"{}\">".format(stylesheet)
+                       for stylesheet in stylesheets)
     return u"""<!DOCTYPE html>
         <meta charset=\"utf-8\">
         <head>
         <title>{title}</title>
-        <link rel=\"stylesheet\" href=\"default.css\">
+        {styles}
         </head>
         <html>
         <body>
-        """.format(title=title)
+        """.format(title=title, styles=styles)
 
 
 def html_footer():
