@@ -42,8 +42,11 @@ class HtmlRenderingTest(unittest.TestCase):
 
     def test_formatted_text(self):
         for kind in list(FormattedText.Kind):
-            formatted_text = FormattedText(kind, [Text("hello world")])
+            text = " ".join(test_utils.word(allow_empty=False)
+                            for _ in range(10))
+            formatted_text = FormattedText(kind, [Text(text)])
             rendered = self.render_elements(formatted_text)
+            self.assertIn(text, rendered)
             if kind in non_span_formatting:
                 open_tag, close_tag = non_span_formatting[kind]
                 self.assertIn(open_tag, rendered)
@@ -89,7 +92,6 @@ class HtmlRenderingTest(unittest.TestCase):
                 self.assertIn("continuation", rendered)
             else:
                 self.assertNotIn("continuation", rendered)
-
 
     class TestFile(object):
         """

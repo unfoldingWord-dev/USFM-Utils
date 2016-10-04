@@ -3,12 +3,14 @@ from __future__ import unicode_literals
 import random
 import unittest
 
+from past.builtins import basestring
+
+from tests import test_utils
 from usfm_utils.elements.abstract_elements import Element
 from usfm_utils.elements.document import Document
 from usfm_utils.elements.element_impls import ChapterNumber, Paragraph, \
     FormattedText, Text, Heading, Whitespace, Footnote
 from usfm_utils.elements.paragraph_utils import LeftAligned
-from tests import test_utils
 from usfm_utils.usfm.flags import paragraphs, indented_paragraphs, \
     lower_open_closes, higher_open_closes, headings, higher_rest_of_lines, \
     lower_until_next_flags, whitespace, footnotes
@@ -77,7 +79,7 @@ class UsfmParserTests(unittest.TestCase):
         for name, (flag, builder) in lower_open_closes.items():
             if builder is None:
                 continue
-            word = test_utils.word()
+            word = test_utils.word(allow_empty=False)
             s = r"\p \{flag} {word}\{flag}*".format(flag=flag, word=word)
             document = self.parse(s)
             elements = document.elements
@@ -87,9 +89,9 @@ class UsfmParserTests(unittest.TestCase):
             self.assertEqual(len(paragraph.children), 1)
             formatted = paragraph.children[0]
             self.assertIsInstance(formatted, FormattedText)
-            self.assertIn(len(formatted.children), [0, 1])
+            self.assertEqual(len(formatted.children), 1)
             if len(formatted.children) > 0 and isinstance(formatted.children[0], Text):
-                    self.assertEqual(formatted.children[0].content, word)
+                self.assertEqual(formatted.children[0].content, word)
 
     def test_higher_open_closes(self):
         for name, (flag, builder) in higher_open_closes.items():
@@ -160,6 +162,13 @@ class UsfmParserTests(unittest.TestCase):
             elements = document.elements
             self.assertEqual(len(elements), 2)
             self.assertIsInstance(elements[0], Paragraph)
+            self.assertEqual(len(elements[0].children), 1)
+            child = elements[0].children[0]
+            self.assertIsInstance(child, FormattedText)
+            self.assertEqual(len(child.children), 1)
+            text = child.children[0]
+            self.assertIsInstance(text, Text)
+            self.assertIsInstance(text.content, basestring)
             self.assertIsInstance(elements[1], Paragraph)
 
     def test_higher_rest_of_lines(self):
@@ -208,7 +217,7 @@ class UsfmParserTests(unittest.TestCase):
         self.assertEqual(toc.short_description, word2)
         self.assertEqual(toc.abbreviation, word3)
 
-    def test_footnotes(self):
+    def test_footnotes1(self):
         for name, (flag, kind) in footnotes.items():
             for label in ("+", "-", "4"):
                 word = test_utils.word()
@@ -228,6 +237,30 @@ class UsfmParserTests(unittest.TestCase):
                 footnote = children[0]
                 self.assertIsInstance(footnote, Footnote)
                 self.assertEqual(footnote.kind, kind)
+
+    def test_footnotes2(self):
+        for name, (flag, kind) in footnotes.items():
+            for label in ("+", "-", "4"):
+                word1 = test_utils.word(allow_empty=False)
+                word2 = test_utils.word(allow_empty=False)
+                paragraph_flag = random.choice(["p", "m", "pi", "ipr"])
+                lines = (
+                    r"\{p}".format(p=paragraph_flag),
+                    r"\{f} {l} {w1} \fqa {w2} \{f}*".format(f=flag, l=label,
+                                                            w1=word1, w2=word2),
+                )
+                document = self.parse(*lines)
+                self.assertIsNone(document.heading)
+                elements = document.elements
+                self.assertEqual(len(elements), 1)
+                paragraph = elements[0]
+                self.assertIsInstance(paragraph, Paragraph)
+                children = paragraph.children
+                self.assertEqual(len(children), 1)
+                footnote = children[0]
+                self.assertIsInstance(footnote, Footnote)
+                self.assertEqual(footnote.kind, kind)
+                self.assertEqual(len(footnote.children), 2)
 
     def test_no_break(self):
         for _ in range(10):

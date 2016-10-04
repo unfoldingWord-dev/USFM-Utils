@@ -189,7 +189,7 @@ class UsfmParser(object):
         for name in lower_until_next_flags:
             _, builder = lower_until_next_flags[name]
             if builder is not None:
-                rule = unary_rule(of_text(builder), 1)
+                rule = unary_rule(of_text(builder), 1, extract=True)
                 rule.__doc__ = "lower_element : {}".format(name)
                 self.register(name, rule)
 
