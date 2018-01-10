@@ -212,17 +212,12 @@ class UsfmParser(object):
         else:
             t[0] = [chapter, Paragraph(t[2])]
 
-    def p_chapter_label_before(self, t):
-        """higher_element : CHAPTER_LABEL CHAPTER lower_elements"""
+    def p_chapter_label(self, t):
+        """higher_element : CHAPTER_LABEL"""
         self.relative_chapter_label = t[1].value
-        text = self.relative_chapter_label + " " + t[2].value
-        chapter = ChapterNumber(ChapterNumber.Kind.standard, [Text(text)])
-        if len(t[3]) == 0:
-            t[0] = [chapter]
-        else:
-            t[0] = [chapter, Paragraph(t[3])]
+        t[0] = []
 
-    def p_chapter_label_after(self, t):
+    def p_chapter_with_chapter_label(self, t):
         """higher_element : CHAPTER CHAPTER_LABEL lower_elements"""
         chapter = ChapterNumber(ChapterNumber.Kind.standard, [Text(t[2].value)])
         if len(t[3]) == 0:
