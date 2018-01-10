@@ -246,7 +246,7 @@ class UsfmParserTests(unittest.TestCase):
                 paragraph_flag = random.choice(["p", "m", "pi", "ipr"])
                 lines = (
                     r"\{p}".format(p=paragraph_flag),
-                    r"\{f} {l} {w1} \fqa {w2} \{f}*".format(f=flag, l=label,
+                    r"\{f} {l} {w1} \fqa {w2} \fqa* \{f}*".format(f=flag, l=label,
                                                             w1=word1, w2=word2),
                 )
                 document = self.parse(*lines)

@@ -108,6 +108,7 @@ lower_open_closes = {
     "EMPHASIS": ("em", FormattedText.Kind.emphasis.construct),
     "FOOTNOTE_DEUTEROCANONICAL": ("fdc", FormattedText.Kind.deuterocanonical.construct),
     "FOOTNOTE_REFERENCE_MARK": ("fm", FormattedText.Kind.footnote_reference_mark.construct),
+    "FOOTNOTE_ALT_QUOTATION": ("fqa", FormattedText.Kind.footnote_alternate_quotation.construct),
 
     "ITALICS": ("it", FormattedText.Kind.italics.construct),
     "KEYWORD": ("k", FormattedText.Kind.keyword.construct),
@@ -175,7 +176,6 @@ ignore_rest_of_lines = {
 # TOKEN_NAME: (flag, callable[children -> Element])
 lower_until_next_flags = {
     # footnotes
-    "FOOTNOTE_ALT_QUOTATION": ("fqa", FormattedText.Kind.footnote_alternate_quotation.construct),
     "FOOTNOTE_KEYWORD": ("fk", FormattedText.Kind.footnote_keyword.construct),
     "FOOTNOTE_TEXT": ("ft", FormattedText.Kind.no_effect.construct),
     "FOOTNOTE_QUOTATION": ("fq", FormattedText.Kind.footnote_quotation.construct),
