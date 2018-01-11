@@ -7,7 +7,6 @@ from past.builtins import basestring
 
 from tests import test_utils
 from usfm_utils.elements.abstract_elements import Element
-from usfm_utils.elements.document import Document
 from usfm_utils.elements.element_impls import ChapterNumber, Paragraph, \
     FormattedText, Text, Heading, Whitespace, Footnote
 from usfm_utils.elements.paragraph_utils import LeftAligned
@@ -76,7 +75,7 @@ class UsfmParserTests(unittest.TestCase):
     # test token "groups"
 
     def test_lower_open_closes(self):
-        for name, (flag, builder) in lower_open_closes.items():
+        for flag, builder in lower_open_closes.values():
             if builder is None:
                 continue
             word = test_utils.word(allow_empty=False)
@@ -94,7 +93,7 @@ class UsfmParserTests(unittest.TestCase):
                 self.assertEqual(formatted.children[0].content, word)
 
     def test_higher_open_closes(self):
-        for name, (flag, builder) in higher_open_closes.items():
+        for flag, builder in higher_open_closes.values():
             if builder is None:
                 continue
             s = r"\{flag} hey\{flag}*".format(flag=flag)
@@ -105,7 +104,7 @@ class UsfmParserTests(unittest.TestCase):
             self.assertIsInstance(element, Element)
 
     def test_paragraphs(self):
-        for name, (flag, builder) in paragraphs.items():
+        for flag, builder in paragraphs.values():
             if builder is None:
                 continue
             num_words = random.randint(0, 10)
@@ -119,7 +118,7 @@ class UsfmParserTests(unittest.TestCase):
             self.assertIn(len(paragraph.children), [0, 1])
 
     def test_indented_paragraphs(self):
-        for name, (flag, builder) in indented_paragraphs.items():
+        for flag, builder in indented_paragraphs.values():
             if builder is None:
                 continue
             for indent in ["", "1", "2", "3", "4", "5", "6"]:
@@ -135,7 +134,7 @@ class UsfmParserTests(unittest.TestCase):
                 self.assertEqual(paragraph.layout.left_margin_indent, expected_indent)
 
     def test_headings(self):
-        for name, (flag, kind) in headings.items():
+        for flag, kind in headings.values():
             if kind is None:
                 continue
             for weight in ["", "1", "2", "3", "4", "5", "6"]:
@@ -155,7 +154,7 @@ class UsfmParserTests(unittest.TestCase):
                 self.assertEqual(text.content, "hello world", err_msg)
 
     def test_until_next_flags(self):
-        for name, (flag, builder) in lower_until_next_flags.items():
+        for flag, builder in lower_until_next_flags.values():
             if builder is None:
                 continue
             document = self.parse(r"\p \{} hello \p world".format(flag))
@@ -172,17 +171,17 @@ class UsfmParserTests(unittest.TestCase):
             self.assertIsInstance(elements[1], Paragraph)
 
     def test_higher_rest_of_lines(self):
-        for name, (flag, builder) in higher_rest_of_lines.items():
+        for flag, builder in higher_rest_of_lines.values():
             if builder is None:
                 continue
-            document = self.parse(r"\p hello", "\{} world".format(flag))
+            document = self.parse(r"\p hello", r"\{} world".format(flag))
             elements = document.elements
             self.assertEqual(len(elements), 2)
             self.assertIsInstance(elements[0], Paragraph)
             self.assertIsInstance(elements[1], Element)
 
     def test_whitespace(self):
-        for name, (flag, kind) in whitespace.items():
+        for flag, kind in whitespace.values():
             document = self.parse(r"\{}".format(flag))
             elements = document.elements
             self.assertEqual(len(elements), 1)
@@ -218,7 +217,7 @@ class UsfmParserTests(unittest.TestCase):
         self.assertEqual(toc.abbreviation, word3)
 
     def test_footnotes1(self):
-        for name, (flag, kind) in footnotes.items():
+        for flag, kind in footnotes.values():
             for label in ("+", "-", "4"):
                 word = test_utils.word()
                 paragraph_flag = random.choice(["p", "m", "pi", "ipr"])
@@ -239,7 +238,7 @@ class UsfmParserTests(unittest.TestCase):
                 self.assertEqual(footnote.kind, kind)
 
     def test_footnotes2(self):
-        for name, (flag, kind) in footnotes.items():
+        for flag, kind in footnotes.values():
             for label in ("+", "-", "4"):
                 word1 = test_utils.word(allow_empty=False)
                 word2 = test_utils.word(allow_empty=False)
@@ -300,7 +299,7 @@ class UsfmParserTests(unittest.TestCase):
             self.assert_raises_at(lines, line_no=2, col=1)
 
     def test_no_footnote_label(self):
-        for name, (flag, kind) in footnotes.items():
+        for flag, _ in footnotes.values():
             lines = (
                 r"\mt1 {}".format(test_utils.word()),
                 r"\{f} \{f}*".format(f=flag),
@@ -308,7 +307,7 @@ class UsfmParserTests(unittest.TestCase):
             self.assert_raises_at(lines, line_no=2, col=len(flag) + 3)
 
     def test_unmatched(self):
-        for name, (flag, kind) in lower_open_closes.items():
+        for flag, kind in lower_open_closes.values():
             if kind is None:
                 continue
             lines = (
