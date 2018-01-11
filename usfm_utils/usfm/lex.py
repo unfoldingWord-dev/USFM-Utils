@@ -34,12 +34,15 @@ class UpdateablePosition(object):
         return Position(self._line, self._col)
 
     def update(self, text):
-        for char in text:
-            if char == "\n":
-                self._line += 1
-                self._col = self._index_from
-            else:
-                self._col += 1
+        index = 0
+        while True:
+            newline_index = text.find('\n', index)
+            if newline_index == -1:
+                self._col += len(text) - index
+                return
+            self._line += 1
+            self._col = self._index_from
+            index = newline_index + 1
 
 
 def lex_open_footnote(flag):
