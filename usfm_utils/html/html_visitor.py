@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from usfm_utils.elements.footnote_utils import FootnoteLabelVisitor
 
-from usfm_utils.elements.document import Document
 from usfm_utils.elements.element_impls import FormattedText, ChapterNumber, \
     Whitespace
 from usfm_utils.elements.element_visitor import ElementVisitor
@@ -78,6 +77,7 @@ class HtmlVisitor(ElementVisitor):
             msg = "Unknown chapter number kind: {}".format(kind)
             raise ValueError(msg)
 
+    # pylint: disable=unused-argument
     def after_chapter_no(self, chapter_no):
         self.record(close_span())
 
@@ -124,6 +124,7 @@ class HtmlVisitor(ElementVisitor):
         clazz = other.kind.name
         self.record(open_span(classes=[clazz]))
 
+    # pylint: disable=unused-argument
     def after_other(self, other):
         self.record(close_span())
 
@@ -165,6 +166,7 @@ class HtmlVisitor(ElementVisitor):
         def result(self):
             return self._result
 
+        # pylint: disable=unused-argument
         def automatic(self, auto):
             self._result = self._default
 

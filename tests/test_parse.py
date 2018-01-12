@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import random
 import unittest
 
+# pylint: disable=redefined-builtin
 from past.builtins import basestring
 
 from tests import test_utils

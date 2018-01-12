@@ -1,4 +1,4 @@
-
+from __future__ import unicode_literals
 
 class Position(object):
     def __init__(self, line, col):

@@ -169,14 +169,15 @@ class UsfmLexer(object):
     def t_error(self, token):
         text = token.value
         newline_index = text.find("\n")
-        max_index = 80 if newline_index < -1 or newline_index > 80 else newline_index
-        text_to_display = "\"{}\"".format(unescape_text(text[:max_index]))
-        raise UsfmInputError("Unrecognized token: {}".format(text_to_display),
-                             self.pos.position)
+        max_index = 80 if newline_index < 0 or newline_index > 80 else newline_index
+        msg = "Unrecognized token: \"{}\"".format(unescape_text(text[:max_index]))
+        raise UsfmInputError(msg, self.pos.position)
 
+    # pylint: disable=unused-argument
     def t_footnotelabel_error(self, token):
         raise UsfmInputError("Expected a footnote label", self.pos.position)
 
+    # pylint: disable=unused-argument
     def t_whitespace(self, t):
         r"""[ \t\r\n]+"""
         pass
