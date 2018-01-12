@@ -1,17 +1,17 @@
 """
 This module stores info about USFM flags that is used by the lexer and parser.
 
-Most of this info is store in dictionaries whose keys are flag names (used as token
-names in lexing), and whose values are (flag, constructor) pairs, where flag is the
-string literal that is used inside USFM files, and constructor is a function for
-constructing the corresponding Element.
+Most of this info is stored in dictionaries whose keys are flag names (used as
+token names in lexing), and whose values are (flag, constructor) pairs, where
+flag is the string literal that is used inside USFM files, and constructor is a
+function for constructing the corresponding Element.
 
-In general, a constructor of None means that a particular flag has special functionality,
-and needs to be handled separately during parsing
+In general, a constructor of None means that a particular flag has special
+functionality, and needs to be handled separately during parsing.
 """
 
 from usfm_utils.elements.element_impls import Paragraph, FormattedText, \
-    ChapterNumber, OtherText, Text, Heading, Whitespace, Footnote
+    ChapterNumber, OtherText, Heading, Whitespace, Footnote
 from usfm_utils.elements.paragraph_utils import Centered, LeftAligned, \
     RightAligned
 
