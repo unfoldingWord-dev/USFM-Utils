@@ -36,10 +36,40 @@ class ElementVisitor(object):
         """
         pass
 
+    def before_chapter_no(self, chapter_no):
+        """
+        :param ChapterNumber chapter_no:
+        """
+        pass
+
+    def after_chapter_no(self, chapter_no):
+        """
+        :param ChapterNumber chapter_no:
+        """
+        pass
+
+    def before_other(self, other):
+        """
+        :param OtherText other:
+        """
+        pass
+
+    def after_other(self, other):
+        """
+        :param OtherText other:
+        """
+        pass
+
     def before_footnote(self, footnote):
+        """
+        :param Footnote footnote:
+        """
         pass
 
     def after_footnote(self, footnote):
+        """
+        :param Footnote footnote:
+        """
         pass
 
     def text(self, text):

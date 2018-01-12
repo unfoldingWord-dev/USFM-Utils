@@ -34,8 +34,7 @@ class HtmlVisitor(ElementVisitor):
         """
         self._file.write(html_header(title=document.heading,
                                      stylesheets=self._stylesheets))
-        for element in document.elements:
-            element.accept(self)
+        document.accept(self)
         self.write_footnotes()
         self._file.write(html_footer())
 

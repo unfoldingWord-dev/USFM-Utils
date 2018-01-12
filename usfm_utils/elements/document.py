@@ -19,6 +19,13 @@ class Document(object):
     def table_of_contents(self):
         return self._table_of_contents
 
+    def accept(self, visitor):
+        """
+        :param ElementVisitor visitor:
+        """
+        for element in self._elements:
+            element.accept(visitor)
+
 
 class TableOfContentsInfo(object):
     def __init__(self, long_description=None, short_description=None, abbreviation=None):
