@@ -128,8 +128,8 @@ class HtmlVisitor(ElementVisitor):
     def after_other(self, other):
         self.record(close_span())
 
-    def text(self, raw_text):
-        self.record(raw_text.content)
+    def text(self, text):
+        self.record(text.content)
 
     def whitespace(self, whitespace):
         kind = whitespace.kind

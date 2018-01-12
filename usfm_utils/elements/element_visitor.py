@@ -42,9 +42,9 @@ class ElementVisitor(object):
     def after_footnote(self, footnote):
         pass
 
-    def text(self, raw_text):
+    def text(self, text):
         """
-        :param RawText raw_text:
+        :param Text text:
         """
         pass
 
