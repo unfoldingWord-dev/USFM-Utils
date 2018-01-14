@@ -42,8 +42,7 @@ class HtmlRenderingTest(unittest.TestCase):
 
     def test_formatted_text(self):
         for kind in list(FormattedText.Kind):
-            text = " ".join(test_utils.word(allow_empty=False)
-                            for _ in range(10))
+            text = test_utils.words(10)
             formatted_text = FormattedText(kind, [Text(text)])
             rendered = self.render_elements(formatted_text)
             self.assertIn(text, rendered)
